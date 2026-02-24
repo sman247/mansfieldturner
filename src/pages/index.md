@@ -5,4 +5,4 @@ Sean Mansfield
 Edward Turner
 
 sean.e.mansfield@gmail.com  
-edwardjaturner@outlook.com
+edwardjaturner@gmail.com
