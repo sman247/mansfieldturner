@@ -1,10 +1,8 @@
 ---
 layout: ../layouts/BaseLayout.astro
 ---
-Sean Mansfield
-
+Sean Mansfield  
 Edward Turner
 
-sean.e.mansfield@gmail.com 
-
+sean.e.mansfield@gmail.com  
 edwardjaturner@outlook.com
