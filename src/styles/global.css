@@ -50,3 +50,35 @@ a {
 .hover-image:hover img {
   display: block;
 }
+
+.hover-image figure {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 600px;
+  z-index: -1;
+  pointer-events: none;
+  margin: 0;
+  text-align: center;
+}
+
+.hover-image figure img {
+  display: block;
+  position: static;
+  transform: none;
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+}
+
+.hover-image figure figcaption {
+  font-size: 14px;
+  color: #555;
+  margin-top: 6px;
+}
+
+.hover-image:hover figure {
+  display: block;
+}
