@@ -111,7 +111,7 @@ import "../styles/global.css";
 					try {
 						await navigator.clipboard.writeText(email);
 						el.classList.add("copied");
-						setTimeout(() => el.classList.remove("copied"), 1200);
+						setTimeout(() => el.classList.remove("copied"), 1500);
 					} catch {
 						const range = document.createRange();
 						range.selectNodeContents(el);
