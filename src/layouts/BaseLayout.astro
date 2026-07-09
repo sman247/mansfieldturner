@@ -21,14 +21,39 @@ import "../styles/global.css";
         </main>
 
 		<script>
-			// Drop an image at a random spot on the page, layered on top.
+			// Drop an image at a random spot below the text, at the consistent
+			// size set by the .project-image CSS rule.
 			function dropImage(src: string): HTMLImageElement {
+				const gap = 12;
+				const content = document.querySelector<HTMLElement>(".content");
+				const rect = content
+					? content.getBoundingClientRect()
+					: ({ bottom: 0 } as DOMRect);
+				const vw = window.innerWidth;
+				const vh = window.innerHeight;
+
 				const img = document.createElement("img");
-				img.src = src;
 				img.className = "project-image";
-				img.style.left = Math.random() * 55 + 2 + "vw";
-				img.style.top = Math.random() * 40 + 5 + "vh";
+				img.style.visibility = "hidden";
+
+				let placed = false;
+				const place = () => {
+					if (placed) return;
+					placed = true;
+					const w = img.offsetWidth;
+					const h = img.offsetHeight;
+					const minX = gap;
+					const maxX = vw - w - gap;
+					const minY = rect.bottom + gap;
+					const maxY = vh - h - gap;
+					img.style.left = minX + Math.random() * Math.max(0, maxX - minX) + "px";
+					img.style.top = minY + Math.random() * Math.max(0, maxY - minY) + "px";
+					img.style.visibility = "visible";
+				};
+				img.addEventListener("load", place);
 				document.body.appendChild(img);
+				img.src = src;
+				if (img.complete && img.naturalWidth) place();
 				return img;
 			}
 
