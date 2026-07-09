@@ -16,6 +16,86 @@ import "../styles/global.css";
 	</head>
 	<body>
 		<!-- <Header title={frontmatter.title} /> -->
-        <slot />
+        <main class="content">
+            <slot />
+        </main>
+
+		<script>
+			// Drop an image at a random spot on the page, layered on top.
+			function dropImage(src: string): HTMLImageElement {
+				const img = document.createElement("img");
+				img.src = src;
+				img.className = "project-image";
+				img.style.left = Math.random() * 55 + 2 + "vw";
+				img.style.top = Math.random() * 40 + 5 + "vh";
+				document.body.appendChild(img);
+				return img;
+			}
+
+			// The "m t" logo: on load, show a random one of its images. Its clicks
+			// then start with the one NOT shown on load and alternate from there.
+			const logo = document.querySelector<HTMLElement>(".logo");
+			if (logo) {
+				const list = (logo.dataset.images ?? "")
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean);
+				if (list.length) {
+					const start = Math.floor(Math.random() * list.length);
+					dropImage(list[start]);
+					let i = start + 1;
+					logo.addEventListener("click", () => {
+						dropImage(list[i % list.length]);
+						i++;
+					});
+				}
+			}
+
+			// Projects: each click drops an image on top as a new layer, stacking
+			// them up. A project can carry a single `data-image`, or a
+			// comma-separated `data-images` list that the clicks cycle through.
+			document.querySelectorAll<HTMLElement>(".project[data-image], .project[data-images]").forEach((el) => {
+				const list = (el.dataset.images ?? el.dataset.image ?? "")
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean);
+				let i = 0;
+				el.addEventListener("click", () => {
+					if (!list.length) return;
+					dropImage(list[i % list.length]);
+					i++;
+				});
+			});
+
+			// Contact: click "Contact" to reveal the emails beneath it.
+			document.querySelectorAll(".contact-toggle").forEach((el) => {
+				el.addEventListener("click", () => {
+					const emails = document.querySelector(".contact-emails");
+					if (emails) emails.classList.toggle("show");
+				});
+			});
+
+			// Emails: the address lives in `data-email` (so Markdown can't turn it
+			// into a mailto link) and is written in as plain, underlined text.
+			// Click to copy to the clipboard; if the clipboard API is unavailable
+			// (e.g. an insecure context), select the text so it can be copied by hand.
+			document.querySelectorAll<HTMLElement>(".email").forEach((el) => {
+				const email = el.dataset.email ?? "";
+				el.textContent = email;
+				el.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(email);
+						el.classList.add("copied");
+						setTimeout(() => el.classList.remove("copied"), 1200);
+					} catch {
+						const range = document.createRange();
+						range.selectNodeContents(el);
+						const sel = window.getSelection();
+						sel?.removeAllRanges();
+						sel?.addRange(range);
+					}
+				});
+			});
+		</script>
 	</body>
 </html>
