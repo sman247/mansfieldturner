@@ -39,6 +39,10 @@ a {
   cursor: pointer;
 }
 
+.project:hover {
+  text-decoration: underline;
+}
+
 /* Page text sits in its own layer, always above the popped-up images. */
 .content {
   position: relative;
