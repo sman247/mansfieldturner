@@ -1,0 +1,78 @@
+---
+import { getCollection } from "astro:content";
+import { Image, getImage } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+	// Drafts are visible in dev but filtered out of production builds.
+	const projects = await getCollection("projects", ({ data }) =>
+		import.meta.env.PROD ? !data.draft : true,
+	);
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+const { data } = project;
+
+// One line: client, discipline and year.
+const meta = [data.client, data.discipline.join(", "), data.year]
+	.filter(Boolean)
+	.join(", ");
+
+// Share image: the project cover, cropped to a 1200x630 card at build time.
+// Falls back (via BaseLayout) to the default wordmark card when there's no cover.
+let ogImage: string | undefined;
+if (data.cover) {
+	const card = await getImage({
+		src: data.cover,
+		width: 1200,
+		height: 630,
+		fit: "cover",
+		position: "center",
+		format: "png",
+	});
+	ogImage = new URL(card.src, Astro.site).href;
+}
+---
+
+<BaseLayout
+	title={`${data.title} — Mansfield Turner`}
+	description={data.summary}
+	ogType="article"
+	ogImage={ogImage}
+	ogImageAlt={data.title}
+>
+	<h1 class="project-title">{data.title}</h1>
+	<p class="project-meta">{meta}</p>
+	<p>{data.summary}</p>
+
+	{
+		data.cover && (
+			<Image
+				src={data.cover}
+				alt={data.coverAlt ?? ""}
+				widths={[512, 1024]}
+				sizes="(min-width: 544px) 480px, 100vw"
+				loading="eager"
+				decoding="async"
+				class="project-photo"
+			/>
+		)
+	}
+	{
+		data.images?.map((img) => (
+			<Image
+				src={img.src}
+				alt={img.alt}
+				widths={[512, 1024]}
+				sizes="(min-width: 544px) 480px, 100vw"
+				loading="lazy"
+				decoding="async"
+				class="project-photo"
+			/>
+		))
+	}
+</BaseLayout>

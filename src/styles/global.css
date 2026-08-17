@@ -35,6 +35,30 @@ a {
     cursor: pointer;
 }
 
+/* The wordmark is an <h1> for semantics; strip the default heading styling so
+   it renders exactly as the old span did. */
+h1.logo {
+    font-weight: normal;
+    margin: 0;
+    margin-bottom: 14px;
+}
+
+/* Project pages: title and metadata inherit the homepage's text register. */
+.project-title {
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+  margin-bottom: 14px;
+}
+
+/* Inline project photographs, held to the text column. */
+.project-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 14px;
+}
+
 .project {
   cursor: pointer;
 }

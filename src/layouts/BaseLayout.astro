@@ -1,21 +1,111 @@
 ---
 import "../styles/global.css";
 
-// import Header from "../components/Header.astro";
+// Cloudflare Web Analytics site token — just the token, not the whole snippet;
+// the layout builds the beacon tag around it below. Public by design (it ships
+// in the built HTML). Leave empty to render nothing.
+const CLOUDFLARE_ANALYTICS_TOKEN = "40c83f54743444118bed581a0c283797";
 
-// const { frontmatter } = Astro.props;
+// Head props may arrive directly (.astro pages) or nested under `frontmatter`
+// (Markdown pages that set `layout:`).
+const { frontmatter } = Astro.props;
+const props = frontmatter ?? Astro.props;
+
+const SITE_NAME = "Mansfield Turner";
+const HOME_TITLE =
+	"Mansfield Turner — Architecture, Set Design, Exhibition & Furniture Design, London";
+const HOME_DESCRIPTION =
+	"Mansfield Turner is a London design partnership working across architecture, set design, exhibition design, furniture and creative consulting.";
+
+// Default share image: the wordmark card in public/. Absolute, per OG spec.
+const OG_IMAGE_DEFAULT = new URL("/og-image.png", Astro.site).href;
+
+const {
+	title,
+	description,
+	ogType = "website",
+	noindex = false,
+	ogImage = OG_IMAGE_DEFAULT,
+	ogImageAlt = "Mansfield Turner",
+	ogImageWidth = 1200,
+	ogImageHeight = 630,
+} = props;
+
+const resolvedTitle = title ?? HOME_TITLE;
+const resolvedDescription = description ?? HOME_DESCRIPTION;
+// Absolute, trailing-slash canonical built from `site` + the served path.
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+const isHome = Astro.url.pathname === "/";
+// Organization structured data — homepage only.
+const organizationLd = {
+	"@context": "https://schema.org",
+	"@type": "Organization",
+	name: "Mansfield Turner",
+	url: "https://mansfieldturner.com",
+	description:
+		"Design partnership working across architecture, set design, exhibition design, furniture and creative consulting.",
+	founder: [
+		{ "@type": "Person", name: "Sean Mansfield" },
+		{ "@type": "Person", name: "Edward Turner" },
+	],
+	address: {
+		"@type": "PostalAddress",
+		addressLocality: "London",
+		addressCountry: "GB",
+	},
+	sameAs: ["https://www.instagram.com/mansfield.turner"],
+	knowsAbout: [
+		"Architecture",
+		"Set design",
+		"Exhibition design",
+		"Furniture design",
+		"Creative consulting",
+	],
+};
 ---
 
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>mansfieldturner</title>
+
+		<title>{resolvedTitle}</title>
+		<meta name="description" content={resolvedDescription} />
+		{
+			noindex ? (
+				<meta name="robots" content="noindex" />
+			) : (
+				<link rel="canonical" href={canonical} />
+			)
+		}
+
+		<meta property="og:title" content={resolvedTitle} />
+		<meta property="og:description" content={resolvedDescription} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:type" content={ogType} />
+		<meta property="og:site_name" content={SITE_NAME} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content={String(ogImageWidth)} />
+		<meta property="og:image:height" content={String(ogImageHeight)} />
+		<meta property="og:image:alt" content={ogImageAlt} />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		{
+			isHome && (
+				<script
+					type="application/ld+json"
+					is:inline
+					set:html={JSON.stringify(organizationLd)}
+				/>
+			)
+		}
 	</head>
 	<body>
-		<!-- <Header title={frontmatter.title} /> -->
         <main class="content">
             <slot />
         </main>
@@ -34,6 +124,9 @@ import "../styles/global.css";
 
 				const img = document.createElement("img");
 				img.className = "project-image";
+				// Decorative overlays behind the text: empty alt so screen
+				// readers skip them rather than announcing the filename.
+				img.alt = "";
 				img.style.visibility = "hidden";
 
 				let placed = false;
@@ -122,5 +215,16 @@ import "../styles/global.css";
 				});
 			});
 		</script>
+
+		{
+			CLOUDFLARE_ANALYTICS_TOKEN && (
+				<script
+					is:inline
+					defer
+					src="https://static.cloudflareinsights.com/beacon.min.js"
+					data-cf-beacon={`{"token": "${CLOUDFLARE_ANALYTICS_TOKEN}"}`}
+				/>
+			)
+		}
 	</body>
 </html>

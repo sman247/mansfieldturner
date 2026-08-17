@@ -1,7 +1,7 @@
 ---
 layout: ../layouts/BaseLayout.astro
 ---
-<span class="logo" data-images="/mt-1.jpeg,/mt-2.jpeg">m t</span>
+<h1 class="logo" data-images="/mt-1.jpeg,/mt-2.jpeg">m t</h1>
 
 Sean Mansfield and Edward Turner.
 
